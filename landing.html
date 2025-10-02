@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Wang Lab Database</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>Wang Lab Database</h1>
+  </header>
+
+  <main>
+    <div class="controls">
+      <div class="filter-dropdown" id="filterDropdown">
+        <button class="filter-btn">Filter ▼</button>
+        <div class="filter-content">
+          <div class="filter-group">
+            <div class="filter-header">General Tissue</div>
+            <div class="filter-options" id="filterTissue"></div>
+          </div>
+          <div class="filter-group">
+            <div class="filter-header">Species</div>
+            <div class="filter-options" id="filterSpecies"></div>
+          </div>
+          <div class="filter-group">
+            <div class="filter-header">Status</div>
+            <div class="filter-options" id="filterStatus"></div>
+          </div>
+        </div>
+      </div>
+      <input type="text" id="searchBox" placeholder="Search datasets…">
+    </div>
+    <div class="tabs" id="techTabs"></div>
+
+    <div class="sheet-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Dataset Name</th>
+            <th>adata_filename</th>
+            <th>Technology</th>
+            <th>Species</th>
+            <th>General Tissue</th>
+            <th>Specific Tissue Region</th>
+            <th>Status</th>
+            <th>Spot numbers</th>
+            <th>Paper</th>
+            <th>Source</th>
+            <th>Link</th>
+          </tr>
+        </thead>
+        <tbody id="data-body"></tbody>
+      </table>
+    </div>
+  </main>
+
+  <footer>
+    © 2025 Wang Lab
+  </footer>
+
+  <!-- PapaParse -->
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

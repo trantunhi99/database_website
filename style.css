@@ -1,0 +1,309 @@
+@import url('https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@400;500;600&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
+  background: linear-gradient(135deg, #f5f5f7, #e3e3e8);
+  color: #1d1d1f;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ---------- HEADER ---------- */
+header {
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  padding: 30px 36px;
+  text-align: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.25);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+  height: 100px;
+}
+
+header h1 {
+  font-size: 22px;
+  font-weight: 600;
+  color: #1d1d1f;
+  letter-spacing: -0.2px;
+}
+
+/* ---------- MAIN ---------- */
+main {
+  flex: 1;
+  padding: 32px 48px;
+  max-width: 1600px;
+  margin: 0 auto;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.controls {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.controls input {
+  padding: 10px 14px;
+  font-size: 15px;
+  border: 1px solid rgba(255,255,255,0.4);
+  border-radius: 12px;
+  width: 280px;
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(15px);
+  transition: all 0.2s;
+}
+
+.controls input:focus {
+  border-color: #0071e3;
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(0,113,227,0.2);
+}
+
+/* ---------- FILTER DROPDOWN ---------- */
+.filter-dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.filter-btn {
+  padding: 10px 14px;
+  background: rgba(255,255,255,0.8);
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.filter-content {
+  display: none;
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(15px);
+  border-radius: 10px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+  width: 260px;
+  max-height: 400px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 12px;
+  z-index: 200;
+}
+
+.filter-dropdown.active .filter-content {
+  display: block;
+}
+
+.filter-group {
+  margin-bottom: 14px;
+  border-bottom: 1px solid rgba(0,0,0,0.08);
+  padding-bottom: 8px;
+}
+
+.filter-group:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.filter-header {
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 6px;
+  color: #1d1d1f;
+  cursor: pointer;
+}
+
+.filter-options {
+  display: none;
+  margin-top: 4px;
+  padding-left: 2px;
+}
+
+.filter-group.active .filter-options {
+  display: block;
+}
+.filter-options label {
+  display: flex;
+  align-items: center;
+  margin: 6px 0 0 0;
+  gap: 6px;            /* space between checkbox and text */
+  font-size: 14px;
+  cursor: pointer;
+  color: #1d1d1f;      /* visible text */
+  white-space: normal; /* allow wrapping */
+}
+.filter-options input[type="checkbox"] {
+  width: auto;         /* don’t stretch full width */
+  height: auto;        /* natural height */
+  flex: 0 0 auto;      /* stop it from growing */
+  margin: 0 6px 0 0;   /* little gap between box and text */
+}
+
+/* -------------TABS ---------- */
+.tabs {
+  display: flex;
+  gap: 0;                     /* no gaps, tabs connect */
+  margin-bottom: 20px;
+  border-bottom: 1px solid rgba(0,0,0,0.1);
+}
+
+.tab-btn {
+  padding: 10px 20px;
+  background: rgba(255, 255, 255, 0.3);
+  border: 1px solid rgba(0,0,0,0.15);
+  border-bottom: none;
+  border-radius: 10px 10px 0 0;
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  margin-right: -1px; /* overlap borders for seamless look */
+  position: relative;
+  top: 1px; /* bring tab a little down */
+}
+
+.tab-btn:hover {
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.tab-btn.active {
+  background: #fff;
+  color: #000;
+  box-shadow: 0 -2px 6px rgba(0,0,0,0.08), 
+              0 2px 4px rgba(0,0,0,0.1);
+  z-index: 2;
+}
+
+
+
+
+/* ---------- TABLE ---------- */
+.sheet-container {
+  flex: 1;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.45);
+  backdrop-filter: blur(25px) saturate(180%);
+  -webkit-backdrop-filter: blur(25px) saturate(180%);
+  overflow-y: auto;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+  max-height: calc(100vh - 180px);
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.sheet-container:hover {
+  box-shadow: 0 16px 40px rgba(0,0,0,0.18);
+  transform: scale(1.002);
+}
+
+/* Scrollbar */
+.sheet-container::-webkit-scrollbar { width: 8px; }
+.sheet-container::-webkit-scrollbar-thumb {
+  background: rgba(150,150,150,0.4);
+  border-radius: 4px;
+}
+.sheet-container:hover::-webkit-scrollbar-thumb {
+  background: rgba(120,120,120,0.6);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 15px;
+}
+
+thead th {
+  background: rgba(255, 255, 255, 1);
+  backdrop-filter: blur(70px) saturate(200%);
+  -webkit-backdrop-filter: blur(70px) saturate(200%);
+  font-weight: 600;
+  border-bottom: 1px solid rgba(255,255,255,0.4);
+  padding: 18px 14px;
+  text-align: left;
+  color: #2c2c2e;
+  text-transform: uppercase;
+  font-size: 13px;
+  letter-spacing: 0.6px;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  transition: background 0.3s ease;
+}
+
+thead th:hover {
+  background: rgba(255, 255, 255, 0.7);
+}
+
+tbody td {
+  padding: 18px 14px;
+  border-bottom: 1px solid rgba(255,255,255,0.2);
+  color: #1d1d1f;
+}
+
+tbody tr:last-child td { border-bottom: none; }
+
+tbody tr {
+  transition: all 0.25s ease;
+}
+
+tbody tr:hover {
+  background: rgba(255,255,255,0.55);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+  border-radius: 8px;
+}
+
+/* ---------- LINKS ---------- */
+a {
+  position: relative;
+  font-weight: 500;
+  transition: color 0.2s ease;
+  color: #0071e3;
+  text-decoration: none;
+}
+
+a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  width: 100%;
+  height: 2px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.3s ease;
+}
+
+a:hover::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+/* ---------- FOOTER ---------- */
+footer {
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(20px);
+  border-top: 1px solid rgba(255,255,255,0.25);
+  padding: 50px;
+  font-size: 13px;
+  color: #3a3a3c;
+  text-align: center;
+  height: 100px;
+}
