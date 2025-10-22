@@ -1,0 +1,22 @@
+🚀 Dash app running on http://0.0.0.0:8050
+🧠 Using HPC Ollama via SSH tunnel → localhost:11434
+Dash is running on http://0.0.0.0:8050/
+
+ * Serving Flask app 'image_chat_app'
+ * Debug mode: off
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8050
+ * Running on http://10.110.25.103:8050
+[33mPress CTRL+C to quit[0m
+10.1.0.20 - - [22/Oct/2025 11:02:02] "GET /?file=/condo/wanglab/shared/database/TCGA-GC-A6I1-01Z-00-DX1/raster_resized.tif HTTP/1.1" 200 -
+10.1.0.20 - - [22/Oct/2025 11:02:02] "[36mGET /assets/style.css?m=1760999835.0505738 HTTP/1.1[0m" 304 -
+10.1.0.20 - - [22/Oct/2025 11:02:02] "[36mGET /assets/script.js?m=1760989947.833492 HTTP/1.1[0m" 304 -
+10.1.0.20 - - [22/Oct/2025 11:02:02] "[36mGET /assets/script.js HTTP/1.1[0m" 304 -
+10.1.0.20 - - [22/Oct/2025 11:02:02] "[36mGET /assets/.ipynb_checkpoints/script-checkpoint.js?m=1760989947.833492 HTTP/1.1[0m" 304 -
+10.1.0.20 - - [22/Oct/2025 11:02:02] "[36mGET /assets/.ipynb_checkpoints/style-checkpoint.css?m=1760999835.0505738 HTTP/1.1[0m" 304 -
+10.1.0.20 - - [22/Oct/2025 11:02:02] "[36mGET /assets/style.css HTTP/1.1[0m" 304 -
+10.1.0.20 - - [22/Oct/2025 11:02:02] "GET /_dash-layout HTTP/1.1" 200 -
+10.1.0.20 - - [22/Oct/2025 11:02:02] "GET /_dash-dependencies HTTP/1.1" 200 -
+10.1.0.20 - - [22/Oct/2025 11:02:02] "POST /_dash-update-component HTTP/1.1" 200 -
+10.1.0.20 - - [22/Oct/2025 11:02:02] "POST /_dash-update-component HTTP/1.1" 200 -

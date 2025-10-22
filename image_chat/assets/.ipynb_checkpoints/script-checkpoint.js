@@ -10,6 +10,24 @@ function waitForChatElements() {
 
   console.log("✅ Chat elements found, initializing chatbot...");
 
+  // 🧩 Get session ID from mirrored div (NOT dcc.Store)
+  function getSessionID() {
+    const mirrorEl = document.querySelector('[id="session-id-mirror"]');
+    if (mirrorEl && mirrorEl.dataset.dashStore) {
+      try {
+        const parsed = JSON.parse(mirrorEl.dataset.dashStore);
+        if (parsed.session_id) {
+          console.log("🧠 Using mirrored session ID:", parsed.session_id);
+          return parsed.session_id;
+        }
+      } catch (err) {
+        console.warn("⚠️ Failed to parse session mirror:", err);
+      }
+    }
+    console.warn("⚠️ No mirrored session ID found, defaulting to 'default'");
+    return "default";
+  }
+
   // 🗨️ Add message to chat window
   function addMessage(text, sender = "user", imagePaths = []) {
     const msg = document.createElement("div");
@@ -55,7 +73,7 @@ function waitForChatElements() {
     chatMessages.scrollTop = chatMessages.scrollHeight;
   }
 
-  // 🧠 Get ROI paths (mirror first)
+  // 🧠 Get ROI paths
   function getROIPaths() {
     const mirrorEl = document.querySelector('[id="roi-data-mirror"]');
     if (mirrorEl && mirrorEl.dataset.dashStore) {
@@ -70,19 +88,11 @@ function waitForChatElements() {
       }
     }
 
-    const storeEl = document.querySelector('[id="roi-data"]');
-    if (storeEl && storeEl.dataset.dashStore) {
-      try {
-        const parsed = JSON.parse(storeEl.dataset.dashStore);
-        if (parsed.paths?.length) return parsed.paths;
-      } catch (_) {}
-    }
-
     console.warn("⚠️ No ROI data found.");
     return [];
   }
 
-  // 🎬 Animated typing effect
+  // 🎬 Typing effect
   function typeText(el, text, delay = 25) {
     return new Promise((resolve) => {
       let i = 0;
@@ -98,10 +108,11 @@ function waitForChatElements() {
     });
   }
 
-  // ⚙️ AI Response with realism
+  // ⚙️ AI response handler
   async function aiRespond(userText) {
     let typingAnim;
     const roiPaths = getROIPaths();
+    const sessionId = getSessionID();
 
     // Create thinking bubble
     const thinking = document.createElement("div");
@@ -121,11 +132,12 @@ function waitForChatElements() {
     }, 400);
 
     try {
-      // Build payload
+      // Build payload with session awareness
       const payload = {
         model: "qwen2.5vl:72b",
         prompt: userText,
         images: roiPaths,
+        session_id: sessionId,
       };
 
       console.log("📡 Sending payload → /api/chat", payload);
@@ -142,14 +154,14 @@ function waitForChatElements() {
       clearInterval(typingAnim);
       dots.remove();
 
-      // Simulate delay before responding (realistic pause)
+      // Simulate realistic pause
       await new Promise((r) => setTimeout(r, 500 + Math.random() * 800));
 
       const replyText = data.response || "(no response)";
       thinking.textContent = "AI: ";
       await typeText(thinking, replyText, 20);
 
-      // 🩻 Show ROI thumbnails if any
+      // 🩻 ROI previews
       if (roiPaths.length > 0) {
         const thumbContainer = document.createElement("div");
         thumbContainer.classList.add("roi-thumbs");
@@ -161,8 +173,6 @@ function waitForChatElements() {
         roiPaths.forEach((path) => {
           const img = document.createElement("img");
           img.src = `/preview?path=${encodeURIComponent(path)}`;
-          // console.log("🧩 ROI preview URL:", img.src);
-
           img.alt = "ROI preview";
           img.style.width = "80px";
           img.style.height = "80px";
@@ -207,7 +217,7 @@ function waitForChatElements() {
     }
   });
 
-  // 👁 Watch ROI mirror updates live
+  // 👁 Watch ROI mirror updates
   const mirrorEl = document.querySelector('[id="roi-data-mirror"]');
   if (mirrorEl) {
     const observer = new MutationObserver(() => {

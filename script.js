@@ -105,12 +105,19 @@ function renderTable(data) {
         a.textContent = "Paper Link";
         a.target = "_blank";
         td.appendChild(a);
-      } else if (col === "Link to view data" && row[col]) {
+      }else if (col === "Link to view data" && row[col]) {
+        // Encode the full file path safely
+        const filePath = encodeURIComponent(row[col].trim());
+        
+        // Open your Dash app, passing the file path in the query string
+        const viewerURL = `http://localhost:8050/?file=${filePath}`;
+        
         const a = document.createElement("a");
-        a.href = row[col];
+        a.href = viewerURL;
         a.textContent = "View Data";
-        a.target = "_blank";
+        a.target = "_blank";  // open in new tab
         td.appendChild(a);
+
       } else {
         td.textContent = row[col] || "";
       }
