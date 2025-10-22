@@ -171,26 +171,25 @@ def create_leaflet_map(
                 nTicks=3,
                 tickText=['', name, ''],
                 style={
-                    # Text
-                    "color": hex_color,           # matches the cell type color
-                    "fontFamily": "SF Pro Display, -apple-system, BlinkMacSystemFont, sans-serif",
+                    # readable modern text
+                    "color": "#1e1e1e",  # neutral dark gray for contrast
+                    "fontFamily": "SF Pro Text, -apple-system, BlinkMacSystemFont, sans-serif",
                     "fontWeight": "500",
                     "fontSize": "13px",
-                    "textShadow": "0 0 6px rgba(0,0,0,0.25)",
+                    "letterSpacing": "-0.25px",
 
-                    # Position / spacing
+                    # clean container look
+                    "backgroundColor": "rgba(255, 255, 255, 0.9)",
+                    "borderRadius": "6px",
+                    "padding": "4px 10px",
+                    "boxShadow": "0 2px 6px rgba(0,0,0,0.08)",
+
+                    # alignment tweaks
+                    "margin": "0px",
                     "transform": f"translateY(-{offset}px)",
-                    "marginBottom": "2px",
-
-                    # “Apple-like” container look
-                    "backgroundColor": "rgba(255, 255, 255, 0.85)",
-                    "backdropFilter": "blur(10px)",
-                    "borderRadius": "8px",
-                    "padding": "4px 8px",
-                    "boxShadow": "0 2px 8px rgba(0,0,0,0.15)",
-                    "border": "1px solid rgba(255,255,255,0.6)",
-                },
+                }
             )
+
 
 
             colorbars.append(cb)
