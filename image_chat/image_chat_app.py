@@ -212,9 +212,9 @@ def load_image_from_url(href):
             overlay_path,
             cors_all=True,
             host="0.0.0.0",
-            port=port,  # use different port for overlay
+            port=port - 1,  # use different port for overlay
             client_host="localhost",
-            client_port=port,
+            client_port=port - 1,
         )
         overlay_layer = get_leaflet_tile_layer(overlay_client)
 
