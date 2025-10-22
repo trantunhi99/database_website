@@ -159,6 +159,7 @@ def mirror_session_id_to_dom(session_id):
 #         return html.Div(f"Error loading image: {e}")
 
 
+# Global registry
 TILE_CLIENT_REGISTRY = {}
 
 @app.callback(
@@ -177,60 +178,43 @@ def load_image_from_url(href):
     base_dir = "/condo/wanglab/shared/database"
     base_path = os.path.join(base_dir, sample_name, "raster_resized.tif")
     overlay_path = os.path.join(base_dir, sample_name, "raster_resized_overlay.tif")
+    port = 9015
+    ip = "localhost"
 
     try:
-        port = 9015
-
-        # --- Base layer client ---
-        if base_path in TILE_CLIENT_REGISTRY:
-            base_client = TILE_CLIENT_REGISTRY[base_path]
-            try:
-                _ = base_client.center()
-                print(f"♻️ Reusing base TileClient for {sample_name}")
-            except Exception as e:
-                print(f"⚠️ Cached base client invalid: {e}. Recreating.")
-                base_client = None
-        else:
-            base_client = None
-
-        if base_client is None:
-            base_client = TileClient(
-                base_path,
-                cors_all=True,
-                host="0.0.0.0",
-                port=port,
-                client_host="localhost",
-                client_port=port,
-            )
-            TILE_CLIENT_REGISTRY[base_path] = base_client
-            print(f"✅ New base TileClient created for {sample_name}")
-
+        # Reuse or create base client
+        base_client = get_or_create_tile_client(base_path, ip, port)
         base_layer = get_leaflet_tile_layer(base_client)
 
-        # --- Overlay layer client ---
-        overlay_client = TileClient(
-            overlay_path,
-            cors_all=True,
-            host="0.0.0.0",
-            port=port,  # use different port for overlay
-            client_host="localhost",
-            client_port=port,
-        )
+        # Reuse or create overlay client (same port)
+        overlay_client = get_or_create_tile_client(overlay_path, ip, port)
         overlay_layer = get_leaflet_tile_layer(overlay_client)
 
-        # --- Create leaflet map with both layers ---
-        leaflet_map = create_leaflet_map(
-            "map",
-            base_client,
-            base_layer,
-            [(overlay_layer, "Overlay")],
-        )
-
+        leaflet_map = create_leaflet_map("map", base_client, base_layer, [(overlay_layer, "Overlay")])
         return leaflet_map
 
     except Exception as e:
         print(f"❌ Failed to load image: {e}")
         return html.Div(f"Error loading image: {e}")
+
+
+def get_or_create_tile_client(file_path, ip, port):
+    """Reuses or creates a TileClient, with validation and registry tracking."""
+    if file_path in TILE_CLIENT_REGISTRY:
+        info = TILE_CLIENT_REGISTRY[file_path]
+        client = info["client"]
+        info["count"] += 1
+        try:
+            _ = client.center()
+            print(f"♻️ Reusing valid TileClient for {file_path}")
+            return client
+        except Exception as e:
+            print(f"⚠️ Client invalid ({e}), recreating...")
+    client = TileClient(file_path, cors_all=True, host="0.0.0.0", port=port, client_host=ip, client_port=port)
+    TILE_CLIENT_REGISTRY[file_path] = {"client": client, "port": port, "count": 1}
+    print(f"✅ Created new TileClient on {ip}:{port} for {file_path}")
+    return client
+
 
 
 # ----------------------------------------------------------------------------
