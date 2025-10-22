@@ -112,9 +112,64 @@ def create_leaflet_map(
             colorbar2 = []
             colorbar3 = []
     else:
-        colorbar1 = dl.Colorbar(colorscale=['#219cd1'], width=20, height=20, min=0, max=1, position="bottomleft", nTicks=3, tickText=['', 'aneuploid', ''],style={"color":"#1EC01E"})
-        colorbar2 = dl.Colorbar(colorscale=['#1bb547'], width=20, height=20, min=0, max=1, position="bottomleft", nTicks=3, tickText=['', 'diploid', ''],style={"color":"#1EC01E"})
-        colorbar3 = dl.Colorbar(colorscale=['#be6ca7'], width=20, height=20, min=0, max=1, position="bottomleft", nTicks=3, tickText=['', 'None', ''],style={"color":"#1EC01E"})
+        COLOR_DICT_CELLS = {
+        0: [92, 20, 186],
+        1: [255, 0, 0],
+        2: [34, 221, 77],
+        3: [35, 92, 236],
+        4: [255, 209, 102],
+        5: [255, 159, 68],
+        6: [255, 0, 0],
+        7: [34, 21, 77],
+        8: [35, 192, 236],
+        9: [254, 255, 100],
+        10: [92, 20, 186],
+        11: [255, 159, 168],
+        12: [255, 59, 68],
+        13: [92, 200, 186],
+        14: [255, 0, 100],
+        15: [34, 221, 177],
+        16: [35, 92, 136],
+        17: [254, 55, 0],
+        18: [120, 68, 229],
+        19: [68, 133, 229],
+        20: [120, 229, 68],
+        21: [0, 229, 68],
+        22: [120, 0, 68],
+        23: [200, 229, 68],
+        24: [120, 229, 0],
+        25: [0, 229, 0],
+    }
+
+    TYPE_NUCLEI_DICT_PANNUKE = {
+        1: "Neoplastic", 2: "Immune", 3: "Stromal", 4: "Epithelial", 5: "Fibroblast",
+        6: "Endothelial", 7: "Cardiomyocyte", 8: "Cardiac Fibroblast", 9: "Smooth Muscle",
+        10: "Adipose", 11: "Oligodendrocyte", 12: "Astrocyte", 13: "Neuron",
+        14: "Vascular Smooth Muscle", 15: "Alveolar pneumocytes", 16: "Chondrocytes",
+        17: "Hepatocyte", 18: "Glia", 19: "Pericentral hepatocytes",
+        20: "Proliferating keratinocytes", 21: "Spinous keratinocytes",
+        22: "Connective", 23: "Lamina propria",
+    }
+
+    # Generate colorbars only for present classes
+    colorbars = []
+    for idx in classes:
+        if idx in TYPE_NUCLEI_DICT_PANNUKE and idx - 1 in COLOR_DICT_CELLS:
+            name = TYPE_NUCLEI_DICT_PANNUKE[idx]
+            rgb = COLOR_DICT_CELLS[idx - 1]
+            hex_color = '#%02x%02x%02x' % tuple(rgb)
+            cb = dl.Colorbar(
+                colorscale=[hex_color],
+                width=20,
+                height=20,
+                min=0,
+                max=1,
+                position="bottomleft",
+                nTicks=3,
+                tickText=["", name, ""],
+                style={"color": hex_color}
+            )
+            colorbars.append(cb)
 
     # create map
     # PZhang added this (deal with empty input regions)

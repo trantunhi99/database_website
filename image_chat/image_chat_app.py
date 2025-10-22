@@ -178,19 +178,37 @@ def load_image_from_url(href):
     base_dir = "/condo/wanglab/shared/database"
     base_path = os.path.join(base_dir, sample_name, "raster_resized.tif")
     overlay_path = os.path.join(base_dir, sample_name, "raster_resized_overlay.tif")
+    json_path = os.path.join(base_dir, sample_name, "present_cell_types.json")
+
     port = 9015
     ip = "localhost"
 
     try:
-        # Reuse or create base client
+        # --- Read JSON file with present cell types ---
+        if os.path.exists(json_path):
+            with open(json_path, "r") as f:
+                classes = json.load(f)
+            print(f"🟢 Loaded {len(classes)} cell types from {json_path}")
+        else:
+            classes = []
+            print("⚠️ No present_cell_types.json found — classes set to empty list")
+
+        # --- Reuse or create base client ---
         base_client = get_or_create_tile_client(base_path, ip, port)
         base_layer = get_leaflet_tile_layer(base_client)
 
-        # Reuse or create overlay client (same port)
+        # --- Reuse or create overlay client (same port) ---
         overlay_client = get_or_create_tile_client(overlay_path, ip, port)
         overlay_layer = get_leaflet_tile_layer(overlay_client)
 
-        leaflet_map = create_leaflet_map("map", base_client, base_layer, [(overlay_layer, "cell types")])
+        # --- Create map, pass classes ---
+        leaflet_map = create_leaflet_map(
+            "map",
+            base_client,
+            base_layer,
+            [(overlay_layer, "cell types")],
+            classes=classes
+        )
         return leaflet_map
 
     except Exception as e:
