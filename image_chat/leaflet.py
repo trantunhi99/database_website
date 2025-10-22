@@ -171,13 +171,30 @@ def create_leaflet_map(
                 nTicks=3,
                 tickText=['', name, ''],
                 style={
-                    "color": hex_color,
-                    "transform": f"translateY(-{offset}px)"  # shift upward to stack
-                }
+                    # Text
+                    "color": hex_color,           # matches the cell type color
+                    "fontFamily": "SF Pro Display, -apple-system, BlinkMacSystemFont, sans-serif",
+                    "fontWeight": "500",
+                    "fontSize": "13px",
+                    "textShadow": "0 0 6px rgba(0,0,0,0.25)",
+
+                    # Position / spacing
+                    "transform": f"translateY(-{offset}px)",
+                    "marginBottom": "2px",
+
+                    # “Apple-like” container look
+                    "backgroundColor": "rgba(255, 255, 255, 0.85)",
+                    "backdropFilter": "blur(10px)",
+                    "borderRadius": "8px",
+                    "padding": "4px 8px",
+                    "boxShadow": "0 2px 8px rgba(0,0,0,0.15)",
+                    "border": "1px solid rgba(255,255,255,0.6)",
+                },
             )
 
+
             colorbars.append(cb)
-            offset += 1  # pixel spacing between colorbars
+            offset += 0  # pixel spacing between colorbars
 
     # create map
     # PZhang added this (deal with empty input regions)
