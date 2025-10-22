@@ -109,6 +109,56 @@ def mirror_session_id_to_dom(session_id):
 # ----------------------------------------------------------------------------
 # Image loading
 # ----------------------------------------------------------------------------
+# TILE_CLIENT_REGISTRY = {}
+
+# @app.callback(
+#     Output("map-container", "children"),
+#     Input("url", "href"),
+# )
+# def load_image_from_url(href):
+#     if not href:
+#         return html.Div("No file specified in URL")
+
+#     query = parse_qs(urlparse(href).query)
+#     file_path = query.get("file", [None])[0]
+#     if not file_path:
+#         return html.Div("Missing ?file= parameter")
+
+#     try:
+#         port = 9015
+#         client = None
+
+#         if file_path in TILE_CLIENT_REGISTRY:
+#             client = TILE_CLIENT_REGISTRY[file_path]
+#             try:
+#                 _ = client.center()
+#                 print(f"♻️ Reusing TileClient for {file_path}")
+#             except Exception as e:
+#                 print(f"⚠️ Cached client invalid: {e}. Recreating.")
+#                 client = None
+
+#         if client is None:
+#             client = TileClient(
+#                 file_path,
+#                 cors_all=True,
+#                 host="0.0.0.0",
+#                 port=port,
+#                 client_host="localhost",
+#                 client_port=port,
+#             )
+#             TILE_CLIENT_REGISTRY[file_path] = client
+#             print(f"✅ New TileClient created for {file_path}")
+
+#         layer = get_leaflet_tile_layer(client)
+#         leaflet_map = create_leaflet_map("map", client, layer, [])
+#         print(layer.url)
+#         return leaflet_map
+
+#     except Exception as e:
+#         print(f"❌ Failed to load image: {e}")
+#         return html.Div(f"Error loading image: {e}")
+
+
 TILE_CLIENT_REGISTRY = {}
 
 @app.callback(
@@ -117,46 +167,71 @@ TILE_CLIENT_REGISTRY = {}
 )
 def load_image_from_url(href):
     if not href:
-        return html.Div("No file specified in URL")
+        return html.Div("No sample specified in URL")
 
     query = parse_qs(urlparse(href).query)
-    file_path = query.get("file", [None])[0]
-    if not file_path:
+    sample_name = query.get("file", [None])[0]
+    if not sample_name:
         return html.Div("Missing ?file= parameter")
+
+    base_dir = "/condo/wanglab/shared/database"
+    base_path = os.path.join(base_dir, sample_name, "raster_resized.tif")
+    overlay_path = os.path.join(base_dir, sample_name, "raster_resized_overlay.tif")
 
     try:
         port = 9015
-        client = None
 
-        if file_path in TILE_CLIENT_REGISTRY:
-            client = TILE_CLIENT_REGISTRY[file_path]
+        # --- Base layer client ---
+        if base_path in TILE_CLIENT_REGISTRY:
+            base_client = TILE_CLIENT_REGISTRY[base_path]
             try:
-                _ = client.center()
-                print(f"♻️ Reusing TileClient for {file_path}")
+                _ = base_client.center()
+                print(f"♻️ Reusing base TileClient for {sample_name}")
             except Exception as e:
-                print(f"⚠️ Cached client invalid: {e}. Recreating.")
-                client = None
+                print(f"⚠️ Cached base client invalid: {e}. Recreating.")
+                base_client = None
+        else:
+            base_client = None
 
-        if client is None:
-            client = TileClient(
-                file_path,
+        if base_client is None:
+            base_client = TileClient(
+                base_path,
                 cors_all=True,
                 host="0.0.0.0",
                 port=port,
                 client_host="localhost",
                 client_port=port,
             )
-            TILE_CLIENT_REGISTRY[file_path] = client
-            print(f"✅ New TileClient created for {file_path}")
+            TILE_CLIENT_REGISTRY[base_path] = base_client
+            print(f"✅ New base TileClient created for {sample_name}")
 
-        layer = get_leaflet_tile_layer(client)
-        leaflet_map = create_leaflet_map("map", client, layer, [])
-        print(layer.url)
+        base_layer = get_leaflet_tile_layer(base_client)
+
+        # --- Overlay layer client ---
+        overlay_client = TileClient(
+            overlay_path,
+            cors_all=True,
+            host="0.0.0.0",
+            port=port + 1,  # use different port for overlay
+            client_host="localhost",
+            client_port=port + 1,
+        )
+        overlay_layer = get_leaflet_tile_layer(overlay_client)
+
+        # --- Create leaflet map with both layers ---
+        leaflet_map = create_leaflet_map(
+            "map",
+            base_client,
+            base_layer,
+            [(overlay_layer, "Overlay")],
+        )
+
         return leaflet_map
 
     except Exception as e:
         print(f"❌ Failed to load image: {e}")
         return html.Div(f"Error loading image: {e}")
+
 
 # ----------------------------------------------------------------------------
 # ROI extraction (multi-user safe)

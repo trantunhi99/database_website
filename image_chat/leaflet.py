@@ -78,10 +78,10 @@ def create_leaflet_map(
 #     f"https://wanglab.tech/tiles/{token}"
 # )
 
-        #layer_url = layer_url.replace(
-         # f"http://{base_client.client_host}:{base_client.client_port}",
-         #  f"http://localhost:{base_client.client_port}"
-         # )
+        layer_url = layer_url.replace(
+         f"http://{base_client.client_host}:{base_client.client_port}",
+          f"http://localhost:{base_client.client_port}"
+         )
     
         layer = dl.BaseLayer(
             dl.TileLayer(
