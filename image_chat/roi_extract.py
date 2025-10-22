@@ -58,9 +58,9 @@ def save_roi(drawn_geojson, file_path, output_dir=None, cleanup_old=False):
 
     # detect which layer we’re saving from
     if "overlay" in os.path.basename(file_path).lower():
-        layer_type = "cell types"
+        layer_type = "cell_types"
     else:
-        layer_type = "base layer"
+        layer_type = "base_layer"
 
     roi_path = output_dir or os.path.join(parent, "roi", layer_type)
     os.makedirs(roi_path, exist_ok=True)

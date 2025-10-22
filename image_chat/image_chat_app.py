@@ -239,10 +239,10 @@ def extract_roi_from_draw(drawn_geojson, layer_name, href, session_id):
         return {}, "❌ No file path found"
 
     # --- determine which layer the user was drawing on ---
-    if layer_name and "cell" in layer_name.lower():
-        layer_type = "cell types"
+    if layer_name == "cell types":
+        layer_type = "cell_types"
     else:
-        layer_type = "base layer"
+        layer_type = "base_layer"
 
     # --- build proper ROI folder ---
     parent = os.path.dirname(file_path)
