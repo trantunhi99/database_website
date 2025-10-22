@@ -233,16 +233,23 @@ def extract_roi_from_draw(drawn_geojson, layer_name, href, session_id):
         session_id = "default"
     print(f"🟢 ROI event triggered (session: {session_id})")
 
+    # --- Match the same logic as load_image_from_url ---
     query = parse_qs(urlparse(href).query)
-    file_path = query.get("file", [None])[0]
-    if not file_path:
-        return {}, "❌ No file path found"
+    sample_name = query.get("file", [None])[0]
+    if not sample_name:
+        return {}, "❌ Missing ?file= parameter"
+
+    base_dir = "/condo/wanglab/shared/database"
+    base_path = os.path.join(base_dir, sample_name, "raster_resized.tif")
+    overlay_path = os.path.join(base_dir, sample_name, "raster_resized_overlay.tif")
 
     # --- determine which layer the user was drawing on ---
     if layer_name == "cell types":
         layer_type = "cell_types"
+        file_path = overlay_path
     else:
         layer_type = "base_layer"
+        file_path = base_path
 
     # --- build proper ROI folder ---
     parent = os.path.dirname(file_path)
@@ -257,10 +264,16 @@ def extract_roi_from_draw(drawn_geojson, layer_name, href, session_id):
         return {"paths": []}, f"🗑️ Cleared ROIs for {layer_type} (session {session_id})"
 
     # --- save new ROIs ---
-    saved_paths = save_roi(drawn_geojson, file_path, output_dir=roi_dir, cleanup_old=True)
+    saved_paths = save_roi(
+        drawn_geojson,
+        file_path,
+        output_dir=roi_dir,
+        cleanup_old=True
+    )
     print(f"✅ Session {session_id} ({layer_type}): saved {len(saved_paths)} ROI(s).")
 
     return {"paths": saved_paths}, f"✅ {len(saved_paths)} ROI(s) saved ({layer_type}, session {session_id})."
+
 
 
 
