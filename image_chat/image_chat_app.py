@@ -435,4 +435,4 @@ def preview_image():
 if __name__ == "__main__":
     print("🚀 Dash app running on http://0.0.0.0:8050")
     print("🧠 Using HPC Ollama via SSH tunnel → localhost:11434")
-    app.run_server(host="0.0.0.0", port=8050, debug=False)
+    app.run_server(host="0.0.0.0", port=8050, debug=True)
