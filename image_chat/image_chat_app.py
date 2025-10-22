@@ -190,7 +190,7 @@ def load_image_from_url(href):
         overlay_client = get_or_create_tile_client(overlay_path, ip, port)
         overlay_layer = get_leaflet_tile_layer(overlay_client)
 
-        leaflet_map = create_leaflet_map("map", base_client, base_layer, [(overlay_layer, "Overlay")])
+        leaflet_map = create_leaflet_map("map", base_client, base_layer, [(overlay_layer, "cell types")])
         return leaflet_map
 
     except Exception as e:
@@ -223,11 +223,12 @@ def get_or_create_tile_client(file_path, ip, port):
 @app.callback(
     [Output("roi-data", "data"), Output("status5", "children")],
     Input("editControl", "geojson"),
+    Input("layer-overlay", "baseLayer"),
     State("url", "href"),
     State("session-id", "data"),
     prevent_initial_call=True,
 )
-def extract_roi_from_draw(drawn_geojson, href, session_id):
+def extract_roi_from_draw(drawn_geojson, layer_name, href, session_id):
     if not session_id:
         session_id = "default"
     print(f"🟢 ROI event triggered (session: {session_id})")
@@ -237,19 +238,30 @@ def extract_roi_from_draw(drawn_geojson, href, session_id):
     if not file_path:
         return {}, "❌ No file path found"
 
+    # --- determine which layer the user was drawing on ---
+    if layer_name and "cell" in layer_name.lower():
+        layer_type = "cell types"
+    else:
+        layer_type = "base layer"
+
+    # --- build proper ROI folder ---
     parent = os.path.dirname(file_path)
-    roi_dir = os.path.join(parent, "roi", session_id)
+    roi_dir = os.path.join(parent, "roi", layer_type, session_id)
     os.makedirs(roi_dir, exist_ok=True)
 
+    # --- clear all ROIs if nothing drawn ---
     if not drawn_geojson or not drawn_geojson.get("features"):
         for f in glob.glob(os.path.join(roi_dir, "*.png")):
             os.remove(f)
-        print(f"🗑️ Cleared all ROIs for session {session_id}")
-        return {"paths": []}, f"🗑️ Cleared ROIs for session {session_id}"
+        print(f"🗑️ Cleared all ROIs for session {session_id} ({layer_type})")
+        return {"paths": []}, f"🗑️ Cleared ROIs for {layer_type} (session {session_id})"
 
+    # --- save new ROIs ---
     saved_paths = save_roi(drawn_geojson, file_path, output_dir=roi_dir, cleanup_old=True)
-    print(f"✅ Session {session_id}: saved {len(saved_paths)} ROI(s).")
-    return {"paths": saved_paths}, f"✅ {len(saved_paths)} ROI(s) saved (session {session_id})."
+    print(f"✅ Session {session_id} ({layer_type}): saved {len(saved_paths)} ROI(s).")
+
+    return {"paths": saved_paths}, f"✅ {len(saved_paths)} ROI(s) saved ({layer_type}, session {session_id})."
+
 
 
 @app.callback(

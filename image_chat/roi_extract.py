@@ -37,7 +37,7 @@ def get_bounding_box(coords):
 def save_roi(drawn_geojson, file_path, output_dir=None, cleanup_old=False):
     """
     Process drawn ROI polygons and return list of cropped image paths.
-    Supports session isolation (via output_dir).
+    Supports session isolation (via output_dir) and layer separation (base vs cell_types).
 
     Args:
         drawn_geojson (dict): GeoJSON from EditControl.
@@ -55,10 +55,21 @@ def save_roi(drawn_geojson, file_path, output_dir=None, cleanup_old=False):
     # --- Setup paths ---
     mapper = get_coord_mapping(file_path)
     parent = os.path.dirname(file_path)
-    roi_path = output_dir or os.path.join(parent, "roi")
+
+    # detect which layer we’re saving from
+    if "overlay" in os.path.basename(file_path).lower():
+        layer_type = "cell types"
+    else:
+        layer_type = "base layer"
+
+    roi_path = output_dir or os.path.join(parent, "roi", layer_type)
     os.makedirs(roi_path, exist_ok=True)
 
-    real_img_path = os.path.join(parent, "real_image")
+    real_img_path = os.path.join(parent, "real_image", layer_type)
+    if not os.path.isdir(real_img_path):
+        # fallback to single real_image folder if layer-specific one doesn't exist
+        real_img_path = os.path.join(parent, "real_image")
+
     if not os.path.isdir(real_img_path):
         raise FileNotFoundError(f"Missing folder: {real_img_path}")
 
@@ -94,6 +105,7 @@ def save_roi(drawn_geojson, file_path, output_dir=None, cleanup_old=False):
         print(f"✅ ROI #{i+1} saved → {save_path}")
 
     return saved_paths
+
 
 
 
