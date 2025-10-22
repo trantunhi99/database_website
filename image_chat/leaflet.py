@@ -177,7 +177,7 @@ def create_leaflet_map(
             )
 
             colorbars.append(cb)
-            offset += 30  # pixel spacing between colorbars
+            offset += 5  # pixel spacing between colorbars
 
     # create map
     # PZhang added this (deal with empty input regions)
