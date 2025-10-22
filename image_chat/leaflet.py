@@ -153,23 +153,30 @@ def create_leaflet_map(
 
     # Generate colorbars only for present classes
     colorbars = []
+    offset = 0
     for idx in classes:
         if idx in TYPE_NUCLEI_DICT_PANNUKE and idx - 1 in COLOR_DICT_CELLS:
             name = TYPE_NUCLEI_DICT_PANNUKE[idx]
             rgb = COLOR_DICT_CELLS[idx - 1]
             hex_color = '#%02x%02x%02x' % tuple(rgb)
+
             cb = dl.Colorbar(
-                colorscale=[hex_color],
+                colorscale=[hex_color],                    # ← color of the bar itself
                 width=20,
                 height=20,
                 min=0,
                 max=1,
                 position="bottomleft",
                 nTicks=3,
-                tickText=["", name, ""],
-                style={"color": hex_color}
+                tickText=['', name, ''],                   # ← label text
+                style={
+                    "color": "#1EC01E",                    # ← fixed green text color
+                    "transform": f"translateY(-{offset}px)"
+                },
             )
+
             colorbars.append(cb)
+            offset += 30  # spacing between bars
 
     # create map
     # PZhang added this (deal with empty input regions)
@@ -181,9 +188,7 @@ def create_leaflet_map(
         id=map_id,
         children=[
            
-            colorbar3,
-            colorbar2,
-            colorbar1,
+            *colorbars,
             dl.LayersControl(
                 overlay_layers, hideSingleBase=True, id="layer-overlay"
             ),
