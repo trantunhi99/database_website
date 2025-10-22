@@ -51,7 +51,7 @@ def create_leaflet_map(
 
     overlay_layers = []
     url = base_layer.url
-    print(url)
+    print("initial url:", url)
     #url = url.replace("0.0.0.0","3.23.18.185")
 #     url = url.replace(
 #     f"http://{base_client.client_host}:{base_client.client_port}",
@@ -61,6 +61,8 @@ def create_leaflet_map(
     f"http://{base_client.client_host}:{base_client.client_port}",
     f"http://localhost:{base_client.client_port}"
     )
+
+    print("after url:", url)
     base_input = dl.BaseLayer(
         dl.TileLayer(
                 url=url,
@@ -77,12 +79,14 @@ def create_leaflet_map(
 #     f"http://{base_client.client_host}:{base_client.client_port}",
 #     f"https://wanglab.tech/tiles/{token}"
 # )
-
+        print("initial layer url:", layer_url)
         layer_url = layer_url.replace(
          f"http://{base_client.client_host}:{base_client.client_port}",
           f"http://localhost:{base_client.client_port}"
          )
-    
+
+        print("after layer url:", layer_url)
+
         layer = dl.BaseLayer(
             dl.TileLayer(
                 opacity=1,
