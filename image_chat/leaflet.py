@@ -87,26 +87,27 @@ def create_leaflet_map(
 
         print("after layer url:", layer_url)
 
-        # layer = dl.BaseLayer(
-        #     dl.TileLayer(
-        #         opacity=1,
-        #         url=layer_url,
-        #         maxZoom=max_zoom,
-        #         minZoom=default_zoom,
-        #     ),
-        #     name=arg_name,checked=checked
-        # )
-        checked = index == len(list_of_layers) - 1 
-        layer = dl.Overlay(
+        layer = dl.BaseLayer(
             dl.TileLayer(
                 opacity=1,
                 url=layer_url,
                 maxZoom=max_zoom,
                 minZoom=default_zoom,
             ),
-            name=arg_name,
-            checked=checked
+            name=arg_name,checked=checked
         )
+        
+        # checked = index == len(list_of_layers) - 1 
+        # layer = dl.Overlay(
+        #     dl.TileLayer(
+        #         opacity=1,
+        #         url=layer_url,
+        #         maxZoom=max_zoom,
+        #         minZoom=default_zoom,
+        #     ),
+        #     name=arg_name,
+        #     checked=checked
+        # )
 
         overlay_layers.append(layer)
     
