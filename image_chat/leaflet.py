@@ -113,33 +113,34 @@ def create_leaflet_map(
             colorbar3 = []
     else:
         COLOR_DICT_CELLS = {
-        0: [92, 20, 186],
-        1: [255, 0, 0],
-        2: [34, 221, 77],
-        3: [35, 92, 236],
-        4: [255, 209, 102],
-        5: [255, 159, 68],
-        6: [255, 0, 0],
-        7: [34, 21, 77],
-        8: [35, 192, 236],
-        9: [254, 255, 100],
-        10: [92, 20, 186],
-        11: [255, 159, 168],
-        12: [255, 59, 68],
-        13: [92, 200, 186],
-        14: [255, 0, 100],
-        15: [34, 221, 177],
-        16: [35, 92, 136],
-        17: [254, 55, 0],
-        18: [120, 68, 229],
-        19: [68, 133, 229],
-        20: [120, 229, 68],
-        21: [0, 229, 68],
-        22: [120, 0, 68],
-        23: [200, 229, 68],
-        24: [120, 229, 0],
-        25: [0, 229, 0],
-    }
+            0: [92, 20, 186],      # Deep purple — Neoplastic
+            1: [255, 0, 0],        # Bright red — Immune
+            2: [34, 221, 77],      # Bright green — Stromal
+            3: [35, 92, 236],      # Strong blue — Epithelial
+            4: [255, 209, 102],    # Soft yellow-orange — Fibroblast
+            5: [255, 159, 68],     # Warm orange — Endothelial
+            6: [200, 50, 50],      # Medium red — Cardiomyocyte (distinct from Immune)
+            7: [60, 40, 120],      # Deep indigo — Cardiac Fibroblast
+            8: [35, 192, 236],     # Sky blue — Smooth Muscle
+            9: [254, 255, 100],    # Pale yellow — Adipose
+            10: [153, 102, 255],   # Lavender — Oligodendrocyte
+            11: [255, 159, 168],   # Light pink — Astrocyte
+            12: [255, 59, 68],     # Bright coral red — Neuron
+            13: [92, 200, 186],    # Teal — Vascular Smooth Muscle
+            14: [255, 0, 100],     # Magenta — Alveolar pneumocytes
+            15: [34, 221, 177],    # Aqua green — Chondrocytes
+            16: [35, 92, 136],     # Steel blue — Hepatocyte
+            17: [254, 55, 0],      # Vivid orange-red — Glia
+            18: [120, 68, 229],    # Violet — Pericentral hepatocytes
+            19: [68, 133, 229],    # Azure — Proliferating keratinocytes
+            20: [120, 229, 68],    # Lime green — Spinous keratinocytes
+            21: [0, 180, 229],     # Aqua-blue — Connective
+            22: [120, 0, 68],      # Maroon — Lamina propria
+            23: [229, 180, 68],    # Golden tan — Reserved / extra
+            24: [229, 68, 180],    # Hot pink — Reserved / extra
+            25: [68, 229, 120],    # Mint green — Reserved / extra
+        }
+
 
     TYPE_NUCLEI_DICT_PANNUKE = {
         1: "Neoplastic", 2: "Immune", 3: "Stromal", 4: "Epithelial", 5: "Fibroblast",
