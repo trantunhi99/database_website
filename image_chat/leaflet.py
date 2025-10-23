@@ -170,7 +170,7 @@ def create_leaflet_map(
     for idx in classes:
         if idx in TYPE_NUCLEI_DICT_PANNUKE and idx in COLOR_DICT_CELLS:
             name = TYPE_NUCLEI_DICT_PANNUKE[idx]
-            print(name)
+            # print(name)
             rgb = COLOR_DICT_CELLS[idx]
             hex_color = '#%02x%02x%02x' % tuple(rgb)  # dynamic hex color
 
@@ -218,8 +218,7 @@ def create_leaflet_map(
     thor_map = dl.Map(
         id=map_id,
         children=[
-           
-            *colorbars,
+            *reversed(colorbars),
             dl.LayersControl(
                 overlay_layers, hideSingleBase=True, id="layer-overlay"
             ),
