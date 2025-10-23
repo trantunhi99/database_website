@@ -168,9 +168,9 @@ def create_leaflet_map(
     colorbars = []
     offset = 0  # vertical stacking offset
     for idx in classes:
-        if idx in TYPE_NUCLEI_DICT_PANNUKE and idx - 1 in COLOR_DICT_CELLS:
+        if idx in TYPE_NUCLEI_DICT_PANNUKE and idx in COLOR_DICT_CELLS:
             name = TYPE_NUCLEI_DICT_PANNUKE[idx]
-            rgb = COLOR_DICT_CELLS[idx - 1]
+            rgb = COLOR_DICT_CELLS[idx]
             hex_color = '#%02x%02x%02x' % tuple(rgb)  # dynamic hex color
 
             # EXACT same format as your example + proper stacking offset
