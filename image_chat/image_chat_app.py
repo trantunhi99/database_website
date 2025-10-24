@@ -12,7 +12,7 @@ from localtileserver import TileClient, get_leaflet_tile_layer
 from leaflet import create_leaflet_map
 from roi_extract import save_roi
 import urllib.parse
-
+import numpy as np
 # ----------------------------------------------------------------------------
 # Dash setup
 # ----------------------------------------------------------------------------
