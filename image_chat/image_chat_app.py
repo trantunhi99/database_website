@@ -260,7 +260,7 @@ def get_or_create_tile_client(file_path, ip, port):
 @app.callback(
     [Output("roi-data", "data"), Output("status5", "children")],
     Input("editControl", "geojson"),
-    Input("layer-overlay", "baseLayer"),
+    Input("layer-overlay", "value"),
     State("url", "href"),
     State("session-id", "data"),
     prevent_initial_call=True,
@@ -269,6 +269,10 @@ def extract_roi_from_draw(drawn_geojson, layer_name, href, session_id):
     if not session_id:
         session_id = "default"
     print(f"🟢 ROI event triggered (session: {session_id})")
+
+    # Expecting layer_name to be a dict with keys "baseLayer" and "overlay"
+    base_layer = layer_name.get("baseLayer") if isinstance(layer_name, dict) else None
+    overlay = layer_name.get("overlay") if isinstance(layer_name, dict) else None
 
     # --- Match the same logic as load_image_from_url ---
     query = parse_qs(urlparse(href).query)
@@ -280,27 +284,27 @@ def extract_roi_from_draw(drawn_geojson, layer_name, href, session_id):
     base_path = os.path.join(base_dir, sample_name, "raster_resized.tif")
     overlay_path = os.path.join(base_dir, sample_name, "raster_resized_overlay.tif")
 
-    # --- determine which layer the user was drawing on ---
-    if layer_name == "base layer":
+    # --- Determine which layer user drew on ---
+    if not overlay or overlay == "":  # no overlay selected
         layer_type = "base_layer"
         file_path = base_path
     else:
         layer_type = "cell_types"
         file_path = overlay_path
-        
-    # --- build proper ROI folder ---
+
+    # --- Build proper ROI folder ---
     parent = os.path.dirname(file_path)
     roi_dir = os.path.join(parent, "roi", layer_type, session_id)
     os.makedirs(roi_dir, exist_ok=True)
 
-    # --- clear all ROIs if nothing drawn ---
+    # --- Clear all ROIs if nothing drawn ---
     if not drawn_geojson or not drawn_geojson.get("features"):
         for f in glob.glob(os.path.join(roi_dir, "*.png")):
             os.remove(f)
         print(f"🗑️ Cleared all ROIs for session {session_id} ({layer_type})")
         return {"paths": []}, f"🗑️ Cleared ROIs for {layer_type} (session {session_id})"
 
-    # --- save new ROIs ---
+    # --- Save new ROIs ---
     saved_paths = save_roi(
         drawn_geojson,
         file_path,
@@ -310,6 +314,7 @@ def extract_roi_from_draw(drawn_geojson, layer_name, href, session_id):
     print(f"✅ Session {session_id} ({layer_type}): saved {len(saved_paths)} ROI(s).")
 
     return {"paths": saved_paths}, f"✅ {len(saved_paths)} ROI(s) saved ({layer_type}, session {session_id})."
+
 
 
 
