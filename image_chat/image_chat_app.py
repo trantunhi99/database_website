@@ -208,7 +208,7 @@ def load_image_from_url(href):
                     overlay_path = os.path.join(overlay_dir, fname)
                     # Extract celltype number
                     layer_name = fname.split("celltype_")[-1].split(".tif")[0]
-                    layer_name = f"celltype_{layer_name}"
+                    layer_name = f"{layer_name}"
                     try:
                         overlay_client = get_or_create_tile_client(overlay_path, ip, port)
                         overlay_layer = get_leaflet_tile_layer(overlay_client)
