@@ -294,7 +294,7 @@ def extract_roi_from_draw(drawn_geojson, base_layer, overlay, href, session_id):
 
     # --- Determine which layer the user drew on ---
     # overlay = name of the active overlay (None if none selected)
-    if overlay and overlay.strip():
+    if overlay and len(overlay) > 0:
         layer_type = "cell_types"
         file_path = overlay_path
     else:
