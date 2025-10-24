@@ -160,6 +160,7 @@ def mirror_session_id_to_dom(session_id):
 
 
 # Global registry
+
 TILE_CLIENT_REGISTRY = {}
 
 @app.callback(
@@ -177,8 +178,10 @@ def load_image_from_url(href):
 
     base_dir = "/condo/wanglab/shared/database"
     base_path = os.path.join(base_dir, sample_name, "raster_resized.tif")
-    overlay_path = os.path.join(base_dir, sample_name, "raster_resized_overlay.tif")
     json_path = os.path.join(base_dir, sample_name, "present_cell_types.json")
+
+    # Folder containing overlay TIFFs
+    overlay_dir = os.path.join(base_dir, sample_name, "cell_types", "raster")
 
     port = 9015
     ip = "localhost"
@@ -197,17 +200,33 @@ def load_image_from_url(href):
         base_client = get_or_create_tile_client(base_path, ip, port)
         base_layer = get_leaflet_tile_layer(base_client)
 
-        # --- Reuse or create overlay client (same port) ---
-        overlay_client = get_or_create_tile_client(overlay_path, ip, port)
-        overlay_layer = get_leaflet_tile_layer(overlay_client)
+        # --- Collect overlay layers ---
+        overlay_layers = []
+        if os.path.exists(overlay_dir):
+            for fname in os.listdir(overlay_dir):
+                if fname.startswith("raster_") and fname.endswith(".tif"):
+                    overlay_path = os.path.join(overlay_dir, fname)
+                    # Extract celltype number
+                    layer_name = fname.split("celltype_")[-1].split(".tif")[0]
+                    layer_name = f"celltype_{layer_name}"
+                    try:
+                        overlay_client = get_or_create_tile_client(overlay_path, ip, port)
+                        overlay_layer = get_leaflet_tile_layer(overlay_client)
+                        overlay_layers.append((overlay_layer, layer_name))
+                        print(f"🟢 Added overlay layer: {layer_name}")
+                    except Exception as sub_e:
+                        print(f"⚠️ Failed to load {fname}: {sub_e}")
+        else:
+            print(f"⚠️ Overlay directory not found: {overlay_dir}")
 
-        # --- Create map, pass classes ---
+        # --- Create map with all overlay layers ---
         leaflet_map = create_leaflet_map(
             "map",
             base_client,
             base_layer,
-            [(overlay_layer, "cell types")],
-            classes=classes
+            overlay_layers,
+            classes=classes,
+            overlay=True
         )
         return leaflet_map
 
@@ -262,13 +281,13 @@ def extract_roi_from_draw(drawn_geojson, layer_name, href, session_id):
     overlay_path = os.path.join(base_dir, sample_name, "raster_resized_overlay.tif")
 
     # --- determine which layer the user was drawing on ---
-    if layer_name == "cell types":
-        layer_type = "cell_types"
-        file_path = overlay_path
-    else:
+    if layer_name == "base layer":
         layer_type = "base_layer"
         file_path = base_path
-
+    else:
+        layer_type = "cell_types"
+        file_path = overlay_path
+        
     # --- build proper ROI folder ---
     parent = os.path.dirname(file_path)
     roi_dir = os.path.join(parent, "roi", layer_type, session_id)
