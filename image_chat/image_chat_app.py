@@ -257,64 +257,79 @@ def get_or_create_tile_client(file_path, ip, port):
 # ----------------------------------------------------------------------------
 # ROI extraction (multi-user safe)
 # ----------------------------------------------------------------------------
+import os
+import glob
+import json
+from urllib.parse import urlparse, parse_qs
+
+from dash import Output, Input, State, html
+
+
 @app.callback(
     [Output("roi-data", "data"), Output("status5", "children")],
-    Input("editControl", "geojson"),
-    Input("layer-overlay", "value"),
-    State("url", "href"),
-    State("session-id", "data"),
+    Input("editControl", "geojson"),            # User drawing input
+    Input("layer-overlay", "baseLayer"),        # Active base layer
+    Input("layer-overlay", "overlay"),          # Active overlay
+    State("url", "href"),                       # URL to get sample name
+    State("session-id", "data"),                # Session handling
     prevent_initial_call=True,
 )
-def extract_roi_from_draw(drawn_geojson, layer_name, href, session_id):
+def extract_roi_from_draw(drawn_geojson, base_layer, overlay, href, session_id):
+    # --- Handle session ---
     if not session_id:
         session_id = "default"
     print(f"🟢 ROI event triggered (session: {session_id})")
 
-    # Expecting layer_name to be a dict with keys "baseLayer" and "overlay"
-    base_layer = layer_name.get("baseLayer") if isinstance(layer_name, dict) else None
-    overlay = layer_name.get("overlay") if isinstance(layer_name, dict) else None
-
-    # --- Match the same logic as load_image_from_url ---
+    # --- Parse URL and sample name ---
     query = parse_qs(urlparse(href).query)
     sample_name = query.get("file", [None])[0]
     if not sample_name:
         return {}, "❌ Missing ?file= parameter"
 
+    # --- Define paths ---
     base_dir = "/condo/wanglab/shared/database"
     base_path = os.path.join(base_dir, sample_name, "raster_resized.tif")
     overlay_path = os.path.join(base_dir, sample_name, "raster_resized_overlay.tif")
-    print(layer_name)
-    print(overlay)
-    # --- Determine which layer user drew on ---
-    if not overlay or overlay == "":  # no overlay selected
-        layer_type = "base_layer"
-        file_path = base_path
-    else:
+
+    # --- Determine which layer the user drew on ---
+    # overlay = name of the active overlay (None if none selected)
+    if overlay and overlay.strip():
         layer_type = "cell_types"
         file_path = overlay_path
+    else:
+        layer_type = "base_layer"
+        file_path = base_path
 
-    # --- Build proper ROI folder ---
+    print(f"🧭 Active layer type: {layer_type} (base_layer={base_layer}, overlay={overlay})")
+
+    # --- Build proper ROI directory ---
     parent = os.path.dirname(file_path)
     roi_dir = os.path.join(parent, "roi", layer_type, session_id)
     os.makedirs(roi_dir, exist_ok=True)
 
-    # --- Clear all ROIs if nothing drawn ---
+    # --- Handle "no drawing" (clear all) ---
     if not drawn_geojson or not drawn_geojson.get("features"):
+        removed_files = 0
         for f in glob.glob(os.path.join(roi_dir, "*.png")):
             os.remove(f)
-        print(f"🗑️ Cleared all ROIs for session {session_id} ({layer_type})")
+            removed_files += 1
+        print(f"🗑️ Cleared {removed_files} ROI(s) for session {session_id} ({layer_type})")
         return {"paths": []}, f"🗑️ Cleared ROIs for {layer_type} (session {session_id})"
 
     # --- Save new ROIs ---
-    saved_paths = save_roi(
-        drawn_geojson,
-        file_path,
-        output_dir=roi_dir,
-        cleanup_old=True
-    )
-    print(f"✅ Session {session_id} ({layer_type}): saved {len(saved_paths)} ROI(s).")
+    try:
+        saved_paths = save_roi(
+            drawn_geojson,
+            file_path,
+            output_dir=roi_dir,
+            cleanup_old=True,
+        )
+        print(f"✅ Session {session_id} ({layer_type}): saved {len(saved_paths)} ROI(s).")
+        return {"paths": saved_paths}, f"✅ {len(saved_paths)} ROI(s) saved ({layer_type}, session {session_id})."
+    except Exception as e:
+        print(f"❌ ROI save failed: {e}")
+        return {}, f"❌ Failed to save ROIs: {e}"
 
-    return {"paths": saved_paths}, f"✅ {len(saved_paths)} ROI(s) saved ({layer_type}, session {session_id})."
 
 
 
