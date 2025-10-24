@@ -253,10 +253,6 @@ def mirror_session_id_to_dom(session_id):
 #     return client
 
 
-import os, json
-from urllib.parse import urlparse, parse_qs
-from dash import html, Input, Output
-from tileclient import TileClient, get_leaflet_tile_layer
 
 TILE_CLIENT_REGISTRY = {}
 
