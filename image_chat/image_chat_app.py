@@ -290,7 +290,7 @@ def extract_roi_from_draw(drawn_geojson, base_layer, overlay, href, session_id):
     base_dir = "/condo/wanglab/shared/database"
     base_path = os.path.join(base_dir, sample_name, "raster_resized.tif")
     overlay_path = os.path.join(base_dir, sample_name, "raster_resized_overlay.tif")
-    print(overlay)
+    # print(overlay)
 
     # --- Determine which layer the user drew on ---
     # overlay = name of the active overlay (None if none selected)
