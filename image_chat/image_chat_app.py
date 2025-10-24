@@ -269,7 +269,7 @@ from dash import Output, Input, State, html
     [Output("roi-data", "data"), Output("status5", "children")],
     Input("editControl", "geojson"),            # User drawing input
     Input("layer-overlay", "baseLayer"),        # Active base layer
-    Input("layer-overlay", "overlay"),          # Active overlay
+    Input("layer-overlay", "overlays"),          # Active overlay
     State("url", "href"),                       # URL to get sample name
     State("session-id", "data"),                # Session handling
     prevent_initial_call=True,
@@ -291,7 +291,7 @@ def extract_roi_from_draw(drawn_geojson, base_layer, overlay, href, session_id):
     base_path = os.path.join(base_dir, sample_name, "raster_resized.tif")
     overlay_path = os.path.join(base_dir, sample_name, "raster_resized_overlay.tif")
     print(overlay)
-    
+
     # --- Determine which layer the user drew on ---
     # overlay = name of the active overlay (None if none selected)
     if overlay and overlay.strip():
